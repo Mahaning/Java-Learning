@@ -1,0 +1,276 @@
+public CommonEvents waitTillElementLocated(By by, long seconds)
+	{
+		new WebDriverWait(driver, Duration.ofSeconds(seconds))
+		.until(ExpectedConditions.presenceOfElementLocated(by));
+		return new CommonEvents(driver);
+	}
+
+
+public boolean isDisplayed(By by)
+	{
+		boolean flag = false;
+		try
+		{
+			waitTillElementVisible(by, 60);
+			if(getWebElement(by).isDisplayed())
+				flag = true;
+		}catch(Exception e)
+		{
+			flag = false;
+		}
+
+		return flag;
+	}
+
+public String getText(By by)
+	{
+		return getWebElement(by).getText();
+	}
+
+
+public CommonEvents jsClick(By by)
+	{
+		((JavascriptExecutor) driver)
+		.executeScript("arguments[0].click()", getWebElement(by));
+		return new CommonEvents(driver);
+	}
+
+public WebElement getWebElement(By by)
+	{
+		return driver.findElement(by);
+	}
+
+public CommonEvents jsScrollToBottomOfThePage() {
+		((JavascriptExecutor) driver).executeScript("window.scrollTo(0, document.body.scrollHeight)");
+		return new CommonEvents(driver);
+	}
+
+
+public String getAttribute(By by, String attributeName)
+	{
+		return getWebElement(by).getAttribute(attributeName);
+	}
+
+public CommonEvents jsScrollToTopOfThePage() {
+	    ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0)");
+	    return new CommonEvents(driver);
+	}
+
+
+public CommonEvents waitTillElementLocated(By by, long seconds)
+	{
+		new WebDriverWait(driver, Duration.ofSeconds(seconds))
+		.until(ExpectedConditions.presenceOfElementLocated(by));
+		return new CommonEvents(driver);
+	}
+
+
+public boolean isSelected(By by) {
+		return getWebElement(by).isSelected();
+	}
+
+public CommonEvents selectByVisibleText(By by, String option)
+	{
+		new Select(getWebElement(by))
+		.selectByVisibleText(option);
+		return new CommonEvents(driver);
+	}
+
+public CommonEvents selectByValue(By by, String value)
+	{
+		new Select(getWebElement(by))
+		.selectByVisibleText(value);
+		return new CommonEvents(driver);
+	}
+
+
+public CommonEvents jsSendKeys(By by, String textToBeEntered)
+	{
+		((JavascriptExecutor)driver)
+		.executeScript("arguments[0].value='"+textToBeEntered+"';", getWebElement(by));
+		return new CommonEvents(driver);
+	}
+
+
+public CommonEvents highlightElement(WebElement element)
+	{
+		JavascriptExecutor jse = (JavascriptExecutor) driver;
+
+		// Add the highlight
+		jse.executeScript("arguments[0].setAttribute('style', 'border: solid 5px green');", element);
+
+		try {
+			// Wait for a specified time (e.g., 500 milliseconds)
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// Remove the highlight
+		jse.executeScript("arguments[0].setAttribute('style', '');", element);
+
+		return new CommonEvents(driver);
+	}
+
+public CommonEvents highlightElementAfterAction(WebElement element)
+	{
+		JavascriptExecutor jse = (JavascriptExecutor)driver;
+		jse.executeScript("arguments[0].setAttribute('style','border: solid 5px green');", element);
+
+		try {
+			// Wait for a specified time (e.g., 500 milliseconds)
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// Remove the highlight
+		jse.executeScript("arguments[0].setAttribute('style', '');", element);
+
+		return new CommonEvents(driver);
+	}
+
+
+public CommonEvents performAltN() {
+		// Create Actions object
+		Actions actions = new Actions(driver);
+
+		// Perform Alt + N keyboard operation
+		actions.keyDown(Keys.ALT)
+		.sendKeys("n")
+		.keyUp(Keys.ALT)
+		.build()
+		.perform();
+
+		return new CommonEvents(driver);
+	}
+
+
+public void scrollDownAndClickVerificationTab() throws Exception {
+		try {
+			JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+			WebElement verificationTab = commonEvents.findElement(getVerificationLocator());
+			jsExecutor.executeScript("arguments[0].scrollIntoView(true);", verificationTab);
+			commonEvents.highlight(verificationTab);
+			commonEvents.click(verificationTab);
+
+			// Wait for the URL to contain "Verification/Inventory"
+			commonEvents.waitForUrlContains("Verification/Inventory", 10);
+		} catch (Exception e) {
+			throw e;
+		}
+
+
+public boolean scrollDownAndClickSubstoreTab() throws Exception {
+		boolean scrolledTillElement = false;
+		try {
+			JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+			WebElement SubstoreTab = commonEvents.findElement(getDropDownLocater);
+			jsExecutor.executeScript("arguments[0].scrollIntoView(true);", SubstoreTab);
+			jsExecutor.executeScript("window.scrollBy(0, -50)");
+			commonEvents.highlight(SubstoreTab);
+			commonEvents.click(SubstoreTab);
+
+			// Wait for the URL to contain "WardSupply"
+			commonEvents.waitForUrlContains("WardSupply", 30);
+
+			scrolledTillElement = true;
+		} catch (Exception e) {
+			throw e;
+		}
+		return scrolledTillElement;
+	}
+
+
+public CommonEvents takeScreenshot(String pageName) throws Exception 
+	{
+		if(pageName==null)
+			throw new Exception("Page name should not be null");
+		try {
+			File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+			FileHandler.copy(src, new File(System.getProperty("user.dir")+"/Screenshots/" + pageName + getTimeStamp() + ".png"));
+		} 
+		catch (Exception e) 
+		{
+			throw new Exception(e);
+		}
+		return new CommonEvents(driver);
+	}
+
+
+public void verifyRadiologySubModules() throws Exception {
+		radiology_pageInstance = new radiology_page(driver);
+		locatorsFactoryInstance = new LocatorsFactory(driver);
+		Assert.assertTrue(radiology_pageInstance.verifyRadiologySubModules(
+				locatorsFactoryInstance.getPageBarFixedLocator("List Requests")));
+		Assert.assertTrue(radiology_pageInstance.verifyRadiologySubModules(
+				locatorsFactoryInstance.getPageBarFixedLocator("List Reports")));
+		Assert.assertTrue(radiology_pageInstance.verifyRadiologySubModules(
+				locatorsFactoryInstance.getPageBarFixedLocator("Edit Doctors")));
+		Assert.assertTrue(radiology_pageInstance.verifyRadiologySubModules(
+				locatorsFactoryInstance.getPageBarFixedLocator("Ward Billing")));
+	}
+
+
+
+public CommonEvents waitForUrlContains(String urlFragment, long seconds) {
+	    new WebDriverWait(driver, Duration.ofSeconds(seconds))
+	        .until(ExpectedConditions.urlContains(urlFragment));
+	    return new CommonEvents(driver);
+	}
+
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			List<WebElement> actualDatesAfterFilterApplied = commonEvents.getWebElements(getActualRequestedOnDates());
+			LocalDate from = LocalDate.parse(fromDate, formatter);
+			LocalDate to = LocalDate.parse(toDate, formatter);
+
+			for (WebElement dateElement : actualDatesAfterFilterApplied) {
+				commonEvents.highlight(dateElement);
+				String dateText = dateElement.getText();
+
+				LocalDate date;
+				LocalDate newDate;
+				try {
+					date = LocalDate.parse(dateText, inputFormatter);
+					newDate = LocalDate.parse(date.format(formatter), formatter);
+
+				} catch (Exception e) {
+					System.out.println("Date parsing failed for: " + dateText);
+					return false;
+				}
+
+				if (newDate.isBefore(from) || newDate.isAfter(to)) {
+					return false;
+				}
+			}
+			return true;
+
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+
+
+
+		
+
+
+
+
+String fromDay, fromMonth, fromYear, toDay, toMonth, toYear;
+			fromDay = fromDate.split("-")[0];
+			fromMonth = fromDate.split("-")[1];
+			fromYear = fromDate.split("-")[2];
+			toDay = toDate.split("-")[0];
+			toMonth = toDate.split("-")[1];
+			toYear = toDate.split("-")[2];
+			WebElement fromDateDropdown = commonEvents.findElement(calendarFromDropdown);
+			WebElement toDateDropdown = commonEvents.findElement(calendarToDropdown);
+			commonEvents.highlight(fromDateDropdown).sendKeys(fromDateDropdown, fromDay)
+					.sendKeys(fromDateDropdown, fromMonth).sendKeys(fromDateDropdown, fromYear);
+			commonEvents.highlight(toDateDropdown).sendKeys(toDateDropdown, toDay).sendKeys(toDateDropdown, toMonth)
+					.sendKeys(toDateDropdown, toYear);
+			clickButtonByText("OK");
+
